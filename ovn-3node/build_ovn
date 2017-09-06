@@ -33,5 +33,6 @@ sudo rpm -i ${OVN_PKG_DIR}/python*-openvswitch-2*.rpm \
             ${OVN_PKG_DIR}/openvswitch-ovn-common-2*.rpm \
             ${OVN_PKG_DIR}/openvswitch-ovn-host-2*.rpm \
             ${OVN_PKG_DIR}/openvswitch-ovn-central-2*.rpm \
+            $(compgen -G "${OVN_PKG_DIR}/openvswitch-selinux-policy-2*.rpm") \
     || { echo >&2 "$@"; echo >&2 "ERROR: failed to install packages"; exit 1; }
 
