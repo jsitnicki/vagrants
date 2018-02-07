@@ -1,0 +1,25 @@
+---
+# Fedora 27 cloud images don't come with python2 which Ansible needs
+- hosts: all
+  gather_facts: no
+  pre_tasks:
+  - name: Install Python 2
+    raw: sudo dnf -y install python2
+
+- hosts: central_group
+  become: yes
+  become_user: root
+  tasks:
+  - name: Install OVN Central
+    dnf: name=openvswitch-ovn-central state=latest
+  - name: Start OVN northd
+    systemd: name=ovn-northd enabled=no state=stopped
+
+- hosts: farm_group
+  become: yes
+  become_user: root
+  tasks:
+  - name: Install OVN Host
+    dnf: name=openvswitch-ovn-host state=latest
+  - name: Start OVN controller
+    systemd: name=ovn-controller enabled=no state=stopped

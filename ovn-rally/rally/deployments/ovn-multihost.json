@@ -1,0 +1,74 @@
+{
+    "type": "OvnMultihostEngine",
+    "controller": {
+        "type": "OvnSandboxControllerEngine",
+        "deployment_name": "ovn-controller-node",
+        "ovs_repo": "https://github.com/openvswitch/ovs.git",
+        "ovs_branch": "master",
+        "ovs_user": "rally",
+        "net_dev": "eth1",
+        "controller_cidr": "192.168.33.2/24",
+        "provider": {
+            "type": "OvsSandboxProvider",
+            "credentials": [
+                {
+                    "host": "192.168.121.44",
+                    "user": "root",
+                    "key": "/home/jkbs/.vagrant.d/insecure_private_key"
+                }
+            ]
+        }
+    },
+    "nodes": [
+        {
+            "type": "OvnSandboxFarmEngine",
+            "deployment_name": "ovn-farm-node-0",
+            "ovs_repo" : "https://github.com/openvswitch/ovs.git",
+            "ovs_branch" : "master",
+            "ovs_user" : "rally",
+            "provider": {
+                "type": "OvsSandboxProvider",
+                "credentials": [
+                    {
+                        "host": "192.168.121.48",
+                        "user": "root",
+                        "key": "/home/jkbs/.vagrant.d/insecure_private_key"
+
+                    }
+                ]
+            }
+        }, {
+            "type": "OvnSandboxFarmEngine",
+            "deployment_name": "ovn-farm-node-1",
+            "ovs_repo" : "https://github.com/openvswitch/ovs.git",
+            "ovs_branch" : "master",
+            "ovs_user" : "rally",
+            "provider": {
+                "type": "OvsSandboxProvider",
+                "credentials": [
+                    {
+                        "host": "192.168.121.148",
+                        "user": "root",
+                        "key": "/home/jkbs/.vagrant.d/insecure_private_key"
+                    }
+                ]
+            }
+        }, {
+            "type": "OvnSandboxFarmEngine",
+            "deployment_name": "ovn-farm-node-2",
+            "ovs_repo" : "https://github.com/openvswitch/ovs.git",
+            "ovs_branch" : "master",
+            "ovs_user" : "rally",
+            "provider": {
+                "type": "OvsSandboxProvider",
+                "credentials": [
+                    {
+                        "host": "192.168.121.13",
+                        "user": "root",
+                        "key":  "/home/jkbs/.vagrant.d/insecure_private_key"
+                    }
+                ]
+            }
+        }
+    ]
+}

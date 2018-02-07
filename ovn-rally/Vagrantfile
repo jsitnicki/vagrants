@@ -1,0 +1,137 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# Based on:
+# - https://github.com/hlrichardson/ovn-vagrant
+# - https://github.com/chilcano/vagrant-multihost-sample-ansible
+#
+# IPv4 network
+#
+#   mgmt 192.168.33.0/24
+#   ===========================================
+#       | .2        | .3       | .4      | .5
+#  +---------+  +-------+  +-------+  +-------+
+#  | central |  | farm0 |  | farm1 |  | farm2 |
+#  +---------+  +-------+  +-------+  +-------+
+#       | .2        | .3       | .4      | .5
+#   ===========================================
+#   data 192.168.66.0/24
+#
+
+VAGRANTFILE_API_VERSION = "2"
+
+ovn_cfg = [
+  {
+    :name => "central",
+    :groups => ["central_group"],
+    :box => "fedora/27-cloud-base",
+    :autostart => true,
+    :host_name  => "central.ovn.dev",
+    :mgmt_ip4 => "192.168.33.2",
+    :mgmt_mask4 => "24",
+    :data_ip4 => "192.168.66.2",
+    :data_mask4 => "24",
+    :memory => 512,
+    :cpus => 1,
+    :mtu => 1500,
+    :nic_type => "virtio",
+    :nic0 => "eth0",
+    :nic1 => "eth1",
+  }, {
+    :name => "farm0",
+    :groups => ["farm_group"],
+    :box => "fedora/27-cloud-base",
+    :autostart => true,
+    :host_name  => "farm0.ovn.dev",
+    :mgmt_ip4 => "192.168.33.3",
+    :mgmt_mask4 => "24",
+    :data_ip4 => "192.168.66.3",
+    :data_mask4 => "24",
+    :memory => 512,
+    :cpus => 1,
+    :mtu => 1500,
+    :nic_type => "virtio",
+    :nic0 => "eth0",
+    :nic1 => "eth1",
+  }, {
+    :name => "farm1",
+    :groups => ["farm_group"],
+    :box => "fedora/27-cloud-base",
+    :autostart => true,
+    :host_name  => "farm1.ovn.dev",
+    :mgmt_ip4 => "192.168.33.4",
+    :mgmt_mask4 => "24",
+    :data_ip4 => "192.168.66.4",
+    :data_mask4 => "24",
+    :memory => 512,
+    :cpus => 1,
+    :mtu => 1500,
+    :nic_type => "virtio",
+    :nic0 => "eth0",
+    :nic1 => "eth1",
+  }, {
+    :name => "farm2",
+    :groups => ["farm_group"],
+    :box => "fedora/27-cloud-base",
+    :autostart => true,
+    :host_name  => "farm2.ovn.dev",
+    :mgmt_ip4 => "192.168.33.5",
+    :mgmt_mask4 => "24",
+    :data_ip4 => "192.168.66.5",
+    :data_mask4 => "24",
+    :memory => 512,
+    :cpus => 1,
+    :mtu => 1500,
+    :nic_type => "virtio",
+    :nic0 => "eth0",
+    :nic1 => "eth1",
+  }
+]
+
+node_groups = {"all_groups:children" => []}
+ovn_cfg.each do |node|
+  if node.has_key?(:groups) then
+    node[:groups].each do |grp|
+      if node_groups.has_key?(grp) then
+        node_groups[grp] << node[:name].to_s
+      else
+        node_groups[grp] = [node[:name].to_s]
+        node_groups["all_groups:children"] << grp
+      end
+    end
+  end
+end
+
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  ovn_cfg.each do |server|
+
+    config.vm.define server[:name], autostart: server[:autostart] do |node|
+      config.ssh.insert_key = false
+      config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'" # avoids 'stdin: is not a tty' error.
+      node.vm.box = server[:box]
+      node.vm.box_check_update = false
+
+      node.vm.hostname = server[:host_name]
+      node.vm.network :private_network,
+                      :ip => server[:mgmt_ip4]
+      node.vm.network :private_network,
+                      :ip => server[:data_ip4]
+
+      config.vm.provider "libvirt" do |domain|
+        domain.memory = server[:memory]
+        domain.cpus = server[:cpus]
+        domain.nic_model_type = server[:nic_type]
+      end
+
+      node.vm.provision :ansible do |ansible|
+          # disable default limit to connect to all the machines
+          ansible.limit = "all"
+          ansible.playbook = "playbook.yml"
+          ansible.groups = node_groups
+      end
+
+    end
+  end
+end

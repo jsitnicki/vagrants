@@ -1,0 +1,64 @@
+{
+    "version": 2,
+    "title": "Create sandbox",
+    "subtasks": [
+        {
+            "title": "Create sandbox on farm 0",
+            "workloads": [{
+                "name": "OvnSandbox.create_sandbox",
+                "args": {
+                    "sandbox_create_args": {
+                        "farm": "ovn-farm-node-0",
+                        "amount": 3,
+                        "batch" : 10,
+                        "start_cidr": "192.168.33.10/24",
+                        "net_dev": "eth1",
+                        "tag": "ToR1"
+                    }
+                },
+                "runner": {"type": "serial", "times": 1},
+                "context": {
+                    "ovn_multihost" : { "controller": "ovn-controller-node"}
+                }
+            }]
+        }, {
+            "title": "Create sandbox on farm 1",
+            "workloads": [{
+                "name": "OvnSandbox.create_sandbox",
+                "args": {
+                    "sandbox_create_args": {
+                        "farm": "ovn-farm-node-1",
+                        "amount": 3,
+                        "batch" : 10,
+                        "start_cidr": "192.168.33.20/24",
+                        "net_dev": "eth1",
+                        "tag": "ToR1"
+                    }
+                },
+                "runner": {"type": "serial", "times": 1},
+                "context": {
+                    "ovn_multihost" : { "controller": "ovn-controller-node"}
+                }
+            }]
+        }, {
+            "title": "Create sandbox on farm 2",
+            "workloads": [{
+                "name": "OvnSandbox.create_sandbox",
+                "args": {
+                    "sandbox_create_args": {
+                        "farm": "ovn-farm-node-2",
+                        "amount": 3,
+                        "batch" : 10,
+                        "start_cidr": "192.168.33.30/24",
+                        "net_dev": "eth1",
+                        "tag": "ToR1"
+                    }
+                },
+                "runner": {"type": "serial", "times": 1},
+                "context": {
+                    "ovn_multihost" : { "controller": "ovn-controller-node"}
+                }
+            }]
+        }
+    ]
+}
