@@ -13,8 +13,8 @@ Install ovn-scale-test,a plugin for Rally, plus fixes for Fedora 27:
 
 ```
 $ git clone https://github.com/jsitnicki/ovn-scale-test.git
-$ cd rally
-$ ./install_rally.sh
+$ cd ovn-scale-test
+$ ./install.sh
 ```
 
 Create VMs using Vagrant+Ansible playbook:
