@@ -19,12 +19,13 @@
 #
 
 VAGRANTFILE_API_VERSION = "2"
+VAGRANT_BOX = "centos/7"
 
 ovn_cfg = [
   {
     :name => "central",
     :groups => ["central_group"],
-    :box => "fedora/27-cloud-base",
+    :box => VAGRANT_BOX,
     :autostart => true,
     :host_name  => "central.ovn.dev",
     :mgmt_ip4 => "192.168.33.2",
@@ -40,7 +41,7 @@ ovn_cfg = [
   }, {
     :name => "farm0",
     :groups => ["farm_group"],
-    :box => "fedora/27-cloud-base",
+    :box => VAGRANT_BOX,
     :autostart => true,
     :host_name  => "farm0.ovn.dev",
     :mgmt_ip4 => "192.168.33.3",
@@ -56,7 +57,7 @@ ovn_cfg = [
   }, {
     :name => "farm1",
     :groups => ["farm_group"],
-    :box => "fedora/27-cloud-base",
+    :box => VAGRANT_BOX,
     :autostart => true,
     :host_name  => "farm1.ovn.dev",
     :mgmt_ip4 => "192.168.33.4",
@@ -72,7 +73,7 @@ ovn_cfg = [
   }, {
     :name => "farm2",
     :groups => ["farm_group"],
-    :box => "fedora/27-cloud-base",
+    :box => VAGRANT_BOX,
     :autostart => true,
     :host_name  => "farm2.ovn.dev",
     :mgmt_ip4 => "192.168.33.5",
