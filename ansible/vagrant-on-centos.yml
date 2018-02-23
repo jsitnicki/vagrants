@@ -1,0 +1,42 @@
+---
+#
+# Install Vagrant on CentOS 7
+# https://gist.github.com/kmassada/f3d635fb1d4b8219778d
+#
+
+- hosts: all
+  gather_facts: false
+  tasks:
+  - name: Install Vagrant dependencies
+    yum:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - ansible
+      - qemu-kvm
+      - libvirt
+      - virt-install
+      - bridge-utils
+      - libvirt-devel
+      - libxslt-devel
+      - libxml2-devel
+      - libvirt-devel
+      - libguestfs-tools-c
+    become: true
+
+  - name: Enable and start libvirtd
+    systemd:
+      name: libvirtd
+      enabled: yes
+      state: started
+    become: yes
+
+  - name: Install Vagrant
+    yum:
+      name: https://releases.hashicorp.com/vagrant/1.9.8/vagrant_1.9.8_x86_64.rpm
+      state: present
+    become: yes
+
+  # XXX: Replace w/ repo from https://ttboj.wordpress.com/tag/vagrant-libvirt/
+  - name: Install vagrant-libvirt plugin
+    command: vagrant plugin install vagrant-libvirt
