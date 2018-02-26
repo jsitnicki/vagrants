@@ -1,0 +1,31 @@
+#
+# Provision a user with passwordless sudo rights on a remote machine.
+#
+# $ ansible-playbook -i machine, provision-user.yml --extra-vars "user=rally-ovs"
+#
+
+- hosts: all
+  gather_facts: false
+  remote_user: root
+  tasks:
+  - name: Allow 'wheel' group to have passwordless sudo
+    lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^%wheel'
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+      validate: 'visudo -cf %s'
+
+  - name: Add user "{{ user }}" with sudo rights
+    user:
+      name: "{{ user }}"
+      group: "{{ user }}"
+      shell: /bin/bash
+      groups: wheel
+      append: yes
+
+  - name: Set authorized key for user "{{ user }}"
+    authorized_key:
+      user: "{{ user }}"
+      state: present
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
