@@ -6,7 +6,7 @@ Install Rally, modified for OVN testing, plus fixes for Fedora 27:
 ```
 $ git clone https://github.com/jsitnicki/rally.git
 $ cd rally
-$ ./install_rally.sh
+$ ./install_rally.sh -d ~/rally-ovs-venv
 ```
 
 Install ovn-scale-test,a plugin for Rally, plus fixes for Fedora 27:
@@ -14,7 +14,7 @@ Install ovn-scale-test,a plugin for Rally, plus fixes for Fedora 27:
 ```
 $ git clone https://github.com/jsitnicki/ovn-scale-test.git
 $ cd ovn-scale-test
-$ ./install.sh
+$ ./install.sh -d ~/rally-ovs-venv
 ```
 
 Create VMs using Vagrant+Ansible playbook:
@@ -32,7 +32,7 @@ Update rally/deployments/ovn-multihost.json with your deployment details:
 Activate Rally, create a deployments, and run a test scenario:
 
 ```
-$ . ~/rally/bin/activate
+$ . ~/rally-ovs-venv/bin/activate
 $ rally-ovs deployment create --filename rally/deployments/ovn-multihost.json --name ovn-multihost
 $ rally-ovs task start rally/scenarios/create-sandboxes.json
 ```
