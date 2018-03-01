@@ -101,6 +101,7 @@ ovn_cfg = [
 ]
 
 # Map group name to list of nodes in the group.
+node_groups = {}
 ovn_cfg.each do |node|
   if node.has_key?(:groups) then
     node[:groups].each do |grp|
