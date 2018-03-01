@@ -19,13 +19,24 @@
 #
 
 VAGRANTFILE_API_VERSION = "2"
-VAGRANT_BOX = "centos/7"
+
+box = {
+  centos: "centos/7",
+  fedora: "fedora/27-cloud-base",
+}
+
+playbook = {
+  centos: "playbook-centos.yml",
+  fedora: "playbook-fedora.yml",
+}
+
+DEFAULT_DISTRO = :centos
 
 ovn_cfg = [
   {
     :name => "central",
     :groups => ["central_group"],
-    :box => VAGRANT_BOX,
+    :distro => DEFAULT_DISTRO,
     :autostart => true,
     :host_name  => "central.ovn.dev",
     :mgmt_ip4 => "192.168.33.2",
@@ -41,7 +52,7 @@ ovn_cfg = [
   }, {
     :name => "farm0",
     :groups => ["farm_group"],
-    :box => VAGRANT_BOX,
+    :distro => DEFAULT_DISTRO,
     :autostart => true,
     :host_name  => "farm0.ovn.dev",
     :mgmt_ip4 => "192.168.33.3",
@@ -57,7 +68,7 @@ ovn_cfg = [
   }, {
     :name => "farm1",
     :groups => ["farm_group"],
-    :box => VAGRANT_BOX,
+    :distro => DEFAULT_DISTRO,
     :autostart => true,
     :host_name  => "farm1.ovn.dev",
     :mgmt_ip4 => "192.168.33.4",
@@ -73,7 +84,7 @@ ovn_cfg = [
   }, {
     :name => "farm2",
     :groups => ["farm_group"],
-    :box => VAGRANT_BOX,
+    :distro => DEFAULT_DISTRO,
     :autostart => true,
     :host_name  => "farm2.ovn.dev",
     :mgmt_ip4 => "192.168.33.5",
@@ -89,7 +100,7 @@ ovn_cfg = [
   }
 ]
 
-node_groups = {"all_groups:children" => []}
+# Map group name to list of nodes in the group.
 ovn_cfg.each do |node|
   if node.has_key?(:groups) then
     node[:groups].each do |grp|
@@ -97,7 +108,6 @@ ovn_cfg.each do |node|
         node_groups[grp] << node[:name].to_s
       else
         node_groups[grp] = [node[:name].to_s]
-        node_groups["all_groups:children"] << grp
       end
     end
   end
@@ -107,11 +117,12 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ovn_cfg.each do |server|
+    distro = server[:distro]
 
     config.vm.define server[:name], autostart: server[:autostart] do |node|
       config.ssh.insert_key = false
       config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'" # avoids 'stdin: is not a tty' error.
-      node.vm.box = server[:box]
+      node.vm.box = box[distro]
       node.vm.box_check_update = false
 
       node.vm.hostname = server[:host_name]
@@ -129,7 +140,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       node.vm.provision :ansible do |ansible|
           # disable default limit to connect to all the machines
           ansible.limit = "all"
-          ansible.playbook = "playbook.yml"
+          ansible.playbook = playbook[distro]
           ansible.groups = node_groups
       end
 
