@@ -3,6 +3,10 @@
 # Install Vagrant on CentOS 7
 # https://gist.github.com/kmassada/f3d635fb1d4b8219778d
 #
+# Usage:
+#
+# $ ansible-playbook -i <machine>, -u <remote-user> vagrant-on-centos.yml
+#
 
 - hosts: all
   gather_facts: false
