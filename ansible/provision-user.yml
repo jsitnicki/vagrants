@@ -16,12 +16,12 @@
       line: '%wheel ALL=(ALL) NOPASSWD: ALL'
       validate: 'visudo -cf %s'
 
-  - name: Add user "{{ user }}" with sudo rights
+  - name: Add user "{{ user }}" with sudo rights and VM management
     user:
       name: "{{ user }}"
       group: "{{ user }}"
       shell: /bin/bash
-      groups: wheel
+      groups: libvirt wheel
       append: yes
 
   - name: Set authorized key for user "{{ user }}"
