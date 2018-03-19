@@ -1,0 +1,5 @@
+[node]
+node1 ovn_dev=em1 ovn_addr=192.168.0.1 ovn_plen=24
+node2 ovn_dev=em1 ovn_addr=192.168.0.2 ovn_plen=24
+node3 ovn_dev=em1 ovn_addr=192.168.0.3 ovn_plen=24
+node4 ovn_dev=em1 ovn_addr=192.168.0.4 ovn_plen=24

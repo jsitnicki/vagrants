@@ -1,0 +1,69 @@
+#
+# Set up nodes for running Browbeat & Rally/ovn-scale-test
+#
+# Host variables needed by this playbook:
+#
+# - each host in "node" group needs:
+#   ovn_dev  - interface used by control plane
+#   ovn_addr - IP address for ovn_dev
+#   ovn_plen - prefix length for ovn_dev
+#
+
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - name: Make directory for SSH key
+    local_action:
+      module: file
+      args:
+        path: "ssh"
+        state: directory
+    tags: ["gen_key"]
+
+  - name: Generate an SSH key
+    local_action:
+      module: shell
+      _raw_params: ssh-keygen -b 4096 -t rsa -f "ssh/id_rsa" -q -N ""
+    tags: ["gen_key"]
+
+- hosts: node
+  vars:
+    user: "browbeat"
+  remote_user: "{{ user }}"
+  gather_facts: no
+  tasks:
+    - name: Configure IP address
+      become: yes
+      shell: |
+        ip link set   dev {{ ovn_dev }} down
+        ip addr flush dev {{ ovn_dev }}
+        ip addr add   dev {{ ovn_dev }} {{ ovn_addr }}/{{ ovn_plen }}
+        ip link set   dev {{ ovn_dev }} up
+      tags: ["ip"]
+
+    - name: Check connectivity
+      shell: |
+        ping -c 1 {{ hostvars[item]['ovn_addr'] }}
+      with_items: "{{ groups['node'] }}"
+      tags: ["ping"]
+
+    - name: Upload pregenerated SSH key
+      copy:
+        src: "{{ item }}"
+        dest: "/home/{{ user }}/.ssh/"
+        mode: u=rw,g=,o=
+        owner: "{{ user }}"
+        group: "{{ user }}"
+      with_items:
+        - "ssh/id_rsa"
+        - "ssh/id_rsa.pub"
+      tags: ["upload_key"]
+
+    - name: Add SSH key to authorized
+      become: yes
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', 'ssh/id_rsa.pub') }}"
+      tags: ["auth_key"]
